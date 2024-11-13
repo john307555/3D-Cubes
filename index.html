@@ -8,26 +8,76 @@
         body {
             margin: 0;
             overflow: hidden;
+            font-family: Arial, sans-serif;
         }
         canvas {
             display: block;
         }
-        #spawnCubeButton {
+        /* Three-line icon (hamburger) */
+        #menuButton {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            color: white;
             cursor: pointer;
+        }
+        /* Control menu styling */
+        #controlMenu {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        #controlMenu label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        #spawnCubeButton, #startAutoSpawnButton, #stopAutoSpawnButton {
+            padding: 8px 15px;
+            font-size: 14px;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        #spawnCubeButton {
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
         }
+        #startAutoSpawnButton {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #stopAutoSpawnButton {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #cubeRate {
+            width: 60px;
+        }
     </style>
 </head>
 <body>
-    <button id="spawnCubeButton">Spawn Cube</button>
+    <!-- Three-line icon for menu -->
+    <div id="menuButton">&#9776;</div>
+
+    <!-- Control menu -->
+    <div id="controlMenu">
+        <button id="spawnCubeButton">Spawn Cube</button>
+        <label for="cubeRate">Cubes per Second:</label>
+        <input type="number" id="cubeRate" min="1" max="100" value="1">
+        <button id="startAutoSpawnButton">Start Auto-Spawn</button>
+        <button id="stopAutoSpawnButton">Stop Auto-Spawn</button>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -46,6 +96,8 @@
         let turnLeft = false;
         let turnRight = false;
         let moveForward = false;
+        let moveBackward = false;
+        let autoSpawnInterval;
 
         // Function to create a cube
         function createCube() {
@@ -74,10 +126,14 @@
                 camera.rotation.y -= 0.02;
             }
 
-            // Move the camera forward in the direction it is facing
+            // Move the camera forward/backward in the direction it is facing
             if (moveForward) {
                 camera.position.z -= 0.1 * Math.cos(camera.rotation.y);
                 camera.position.x -= 0.1 * Math.sin(camera.rotation.y);
+            }
+            if (moveBackward) {
+                camera.position.z += 0.1 * Math.cos(camera.rotation.y);
+                camera.position.x += 0.1 * Math.sin(camera.rotation.y);
             }
 
             // Render the scene
@@ -101,6 +157,10 @@
                 case 'KeyW':
                     moveForward = true;
                     break;
+                case 'ArrowDown':
+                case 'KeyS':
+                    moveBackward = true;
+                    break;
             }
         });
 
@@ -118,11 +178,34 @@
                 case 'KeyW':
                     moveForward = false;
                     break;
+                case 'ArrowDown':
+                case 'KeyS':
+                    moveBackward = false;
+                    break;
             }
         });
 
-        // Button to spawn cubes
+        // Button to spawn a single cube
         document.getElementById('spawnCubeButton').addEventListener('click', createCube);
+
+        // Function to start auto-spawning cubes
+        function startAutoSpawn() {
+            const cubesPerSecond = document.getElementById('cubeRate').value;
+            if (autoSpawnInterval) clearInterval(autoSpawnInterval);  // Clear any existing interval
+            autoSpawnInterval = setInterval(createCube, 1000 / cubesPerSecond);
+        }
+
+        // Start and stop auto-spawn buttons
+        document.getElementById('startAutoSpawnButton').addEventListener('click', startAutoSpawn);
+        document.getElementById('stopAutoSpawnButton').addEventListener('click', () => {
+            clearInterval(autoSpawnInterval);
+        });
+
+        // Toggle control menu visibility
+        document.getElementById('menuButton').addEventListener('click', () => {
+            const controlMenu = document.getElementById('controlMenu');
+            controlMenu.style.display = controlMenu.style.display === 'none' ? 'block' : 'none';
+        });
 
         // Handle window resize
         window.addEventListener('resize', () => {
