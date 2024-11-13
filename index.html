@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Cubes</title>
+    <title>3D Scene with Sliding Menu</title>
     <style>
         body {
             margin: 0;
@@ -34,6 +34,7 @@
             width: 250px;
             height: auto;
             transition: right 0.3s ease-in-out;  /* Smooth sliding effect */
+            display: none; /* Initially hidden */
         }
         #controlMenu label {
             display: block;
@@ -207,10 +208,17 @@
         document.getElementById('menuButton').addEventListener('click', () => {
             const controlMenu = document.getElementById('controlMenu');
             const currentPosition = controlMenu.style.right;
+
             if (currentPosition === '0px') {
                 controlMenu.style.right = '-250px';  // Slide out
+                setTimeout(() => {
+                    controlMenu.style.display = 'none';  // Hide menu after sliding out
+                }, 300);  // Wait for the sliding transition to finish
             } else {
-                controlMenu.style.right = '0px';    // Slide in
+                controlMenu.style.display = 'block';  // Show the menu
+                setTimeout(() => {
+                    controlMenu.style.right = '0px';  // Slide in
+                }, 10);  // Small delay to trigger the sliding animation
             }
         });
 
