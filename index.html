@@ -105,33 +105,33 @@
         // Array to store the spawned cubes
         let cubes = [];
 
-        // Function to create a cube in a grid/cube shape around the user
-        function createCubeGrid(rows, columns, spacing) {
+        // Function to create cubes surrounding the player in 3D space
+        function createCubesSurroundingPlayer(numCubes, radius) {
             // Clear any existing cubes in the scene
             cubes.forEach(cube => scene.remove(cube));
             cubes = [];
 
-            for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < columns; j++) {
-                    const geometry = new THREE.BoxGeometry();
-                    const material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
-                    const cube = new THREE.Mesh(geometry, material);
+            for (let i = 0; i < numCubes; i++) {
+                const geometry = new THREE.BoxGeometry();
+                const material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
+                const cube = new THREE.Mesh(geometry, material);
 
-                    // Set cube position relative to the camera (grid pattern)
-                    cube.position.x = (i - rows / 2) * spacing;
-                    cube.position.y = (j - columns / 2) * spacing;
-                    cube.position.z = -5;  // Place cubes at a fixed z distance from the camera
+                // Position cubes around the player in a spherical pattern
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.random() * Math.PI * 2;
+                cube.position.x = radius * Math.sin(phi) * Math.cos(theta);
+                cube.position.y = radius * Math.sin(phi) * Math.sin(theta);
+                cube.position.z = radius * Math.cos(phi);
 
-                    scene.add(cube);
-                    cubes.push(cube);
-                }
+                scene.add(cube);
+                cubes.push(cube);
             }
         }
 
-        // Function to update cubes so they follow the camera
+        // Function to update cubes so they follow the player
         function updateCubes() {
             cubes.forEach(cube => {
-                // Position cubes relative to the camera's position
+                // Position cubes relative to the camera's position (slightly trailing behind)
                 cube.position.x += (camera.position.x - cube.position.x) * 0.05;
                 cube.position.y += (camera.position.y - cube.position.y) * 0.05;
                 cube.position.z += (camera.position.z - cube.position.z) * 0.05;
@@ -212,16 +212,16 @@
             }
         });
 
-        // Button to spawn a single cube
+        // Button to spawn cubes surrounding the player
         document.getElementById('spawnCubeButton').addEventListener('click', () => {
-            createCubeGrid(5, 5, 2);  // Create a 5x5 grid of cubes with spacing of 2
+            createCubesSurroundingPlayer(10, 10);  // Spawn 10 cubes around the player within a radius of 10 units
         });
 
         // Function to start auto-spawning cubes
         function startAutoSpawn() {
             const cubesPerSecond = document.getElementById('cubeRate').value;
             if (autoSpawnInterval) clearInterval(autoSpawnInterval);  // Clear any existing interval
-            autoSpawnInterval = setInterval(() => createCubeGrid(5, 5, 2), 1000 / cubesPerSecond);  // Auto-spawn cubes in grid
+            autoSpawnInterval = setInterval(() => createCubesSurroundingPlayer(10, 10), 1000 / cubesPerSecond);  // Auto-spawn cubes
         }
 
         // Start and stop auto-spawn buttons
