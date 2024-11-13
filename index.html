@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infinite 3D Cubes</title>
+    <title>3D Scene with Spawn and Move Controls</title>
     <style>
         body {
             margin: 0;
@@ -12,9 +12,23 @@
         canvas {
             display: block;
         }
+        #spawnCubeButton {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
+    <button id="spawnCubeButton">Spawn Cube</button>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
@@ -31,6 +45,7 @@
         // Control variables
         let turnLeft = false;
         let turnRight = false;
+        let moveForward = false;
 
         // Function to create a cube
         function createCube() {
@@ -51,9 +66,6 @@
         function animate() {
             requestAnimationFrame(animate);
 
-            // Spawn a new cube on each frame
-            createCube();
-
             // Check for turn controls
             if (turnLeft) {
                 camera.rotation.y += 0.02;
@@ -62,13 +74,19 @@
                 camera.rotation.y -= 0.02;
             }
 
+            // Move the camera forward in the direction it is facing
+            if (moveForward) {
+                camera.position.z -= 0.1 * Math.cos(camera.rotation.y);
+                camera.position.x -= 0.1 * Math.sin(camera.rotation.y);
+            }
+
             // Render the scene
             renderer.render(scene, camera);
         }
 
         animate();
 
-        // Event listeners for arrow and A/D key controls
+        // Event listeners for arrow, WASD, and space key controls
         document.addEventListener('keydown', (event) => {
             switch (event.code) {
                 case 'ArrowLeft':
@@ -78,6 +96,10 @@
                 case 'ArrowRight':
                 case 'KeyD':
                     turnRight = true;
+                    break;
+                case 'ArrowUp':
+                case 'KeyW':
+                    moveForward = true;
                     break;
             }
         });
@@ -92,8 +114,15 @@
                 case 'KeyD':
                     turnRight = false;
                     break;
+                case 'ArrowUp':
+                case 'KeyW':
+                    moveForward = false;
+                    break;
             }
         });
+
+        // Button to spawn cubes
+        document.getElementById('spawnCubeButton').addEventListener('click', createCube);
 
         // Handle window resize
         window.addEventListener('resize', () => {
