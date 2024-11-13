@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Cubes</title>
     <style>
         body {
@@ -40,7 +40,7 @@
             display: block;
             margin: 10px 0 5px;
         }
-        #spawnCubeButton, #startAutoSpawnButton, #stopAutoSpawnButton {
+        #spawnCubeButton, #startAutoSpawnButton, #stopAutoSpawnButton, #deleteAllCubesButton {
             padding: 8px 15px;
             font-size: 14px;
             margin: 5px 0;
@@ -64,6 +64,12 @@
             border: none;
             border-radius: 5px;
         }
+        #deleteAllCubesButton {
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
         #cubeRate {
             width: 60px;
         }
@@ -80,6 +86,7 @@
         <input type="number" id="cubeRate" min="1" max="100" value="1">
         <button id="startAutoSpawnButton">Start Auto-Spawn</button>
         <button id="stopAutoSpawnButton">Stop Auto-Spawn</button>
+        <button id="deleteAllCubesButton">Delete All Cubes</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -124,6 +131,14 @@
                 scene.add(cube);
                 cubes.push(cube);
             }
+        }
+
+        // Function to delete all cubes
+        function deleteAllCubes() {
+            for (let i = 0; i < cubes.length; i++) {
+                scene.remove(cubes[i]);
+            }
+            cubes = []; // Clear the cube array
         }
 
         // Animation loop
@@ -233,6 +248,11 @@
         document.getElementById('startAutoSpawnButton').addEventListener('click', startAutoSpawn);
         document.getElementById('stopAutoSpawnButton').addEventListener('click', () => {
             clearInterval(autoSpawnInterval);
+        });
+
+        // Add an event listener for the delete all cubes button
+        document.getElementById('deleteAllCubesButton').addEventListener('click', () => {
+            deleteAllCubes(); // Delete all cubes when button is clicked
         });
 
         // Toggle control menu visibility with sliding animation
