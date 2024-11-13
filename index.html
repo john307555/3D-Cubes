@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Cubes</title>
+    <title>3D Scene with Sliding Menu</title>
     <style>
         body {
             margin: 0;
@@ -102,24 +102,48 @@
         let moveBackward = false;
         let autoSpawnInterval;
 
-        // Function to create a cube
-        function createCube() {
-            const geometry = new THREE.BoxGeometry();
-            const material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
-            const cube = new THREE.Mesh(geometry, material);
+        // Array to store the spawned cubes
+        let cubes = [];
 
-            // Position the cube at a random location within range
-            cube.position.x = (Math.random() - 0.5) * 20;
-            cube.position.y = (Math.random() - 0.5) * 20;
-            cube.position.z = (Math.random() - 0.5) * 20;
+        // Function to create a cube in a grid/cube shape around the user
+        function createCubeGrid(rows, columns, spacing) {
+            // Clear any existing cubes in the scene
+            cubes.forEach(cube => scene.remove(cube));
+            cubes = [];
 
-            // Add cube to the scene
-            scene.add(cube);
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < columns; j++) {
+                    const geometry = new THREE.BoxGeometry();
+                    const material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
+                    const cube = new THREE.Mesh(geometry, material);
+
+                    // Set cube position relative to the camera (grid pattern)
+                    cube.position.x = (i - rows / 2) * spacing;
+                    cube.position.y = (j - columns / 2) * spacing;
+                    cube.position.z = -5;  // Place cubes at a fixed z distance from the camera
+
+                    scene.add(cube);
+                    cubes.push(cube);
+                }
+            }
+        }
+
+        // Function to update cubes so they follow the camera
+        function updateCubes() {
+            cubes.forEach(cube => {
+                // Position cubes relative to the camera's position
+                cube.position.x += (camera.position.x - cube.position.x) * 0.05;
+                cube.position.y += (camera.position.y - cube.position.y) * 0.05;
+                cube.position.z += (camera.position.z - cube.position.z) * 0.05;
+            });
         }
 
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
+
+            // Update cube positions to follow the camera
+            updateCubes();
 
             // Check for turn controls
             if (turnLeft) {
@@ -189,13 +213,15 @@
         });
 
         // Button to spawn a single cube
-        document.getElementById('spawnCubeButton').addEventListener('click', createCube);
+        document.getElementById('spawnCubeButton').addEventListener('click', () => {
+            createCubeGrid(5, 5, 2);  // Create a 5x5 grid of cubes with spacing of 2
+        });
 
         // Function to start auto-spawning cubes
         function startAutoSpawn() {
             const cubesPerSecond = document.getElementById('cubeRate').value;
             if (autoSpawnInterval) clearInterval(autoSpawnInterval);  // Clear any existing interval
-            autoSpawnInterval = setInterval(createCube, 1000 / cubesPerSecond);
+            autoSpawnInterval = setInterval(() => createCubeGrid(5, 5, 2), 1000 / cubesPerSecond);  // Auto-spawn cubes in grid
         }
 
         // Start and stop auto-spawn buttons
