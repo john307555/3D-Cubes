@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Cubes</title>
+    <meta name="viewport" content="width=device-width, initial initial-scale=1.0">
+    <title>3D Scene with Sliding Menu</title>
     <style>
         body {
             margin: 0;
@@ -100,6 +100,8 @@
         let turnRight = false;
         let moveForward = false;
         let moveBackward = false;
+        let moveUp = false;   // Move camera up (E key)
+        let moveDown = false; // Move camera down (Q key)
         let autoSpawnInterval;
 
         // Array to store the spawned cubes
@@ -146,6 +148,14 @@
                 camera.position.x += 0.1 * Math.sin(camera.rotation.y);
             }
 
+            // Move the camera up/down
+            if (moveUp) {
+                camera.position.y += 0.1; // Move up
+            }
+            if (moveDown) {
+                camera.position.y -= 0.1; // Move down
+            }
+
             // Render the scene
             renderer.render(scene, camera);
         }
@@ -171,6 +181,12 @@
                 case 'KeyS':
                     moveBackward = true;
                     break;
+                case 'KeyQ': // Q key
+                    moveDown = true;
+                    break;
+                case 'KeyE': // E key
+                    moveUp = true;
+                    break;
             }
         });
 
@@ -191,6 +207,12 @@
                 case 'ArrowDown':
                 case 'KeyS':
                     moveBackward = false;
+                    break;
+                case 'KeyQ': // Q key
+                    moveDown = false;
+                    break;
+                case 'KeyE': // E key
+                    moveUp = false;
                     break;
             }
         });
